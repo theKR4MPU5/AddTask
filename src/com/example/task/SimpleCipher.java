@@ -1,22 +1,26 @@
+package com.example.task;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class SimpleSubstitutionCipher {
-    //Сохранение таблицы замены
-    private char[] substitutionTable;
-    //Конструктор класса и реалиизация
-    public SimpleSubstitutionCipher(String substitutionTableFile) {
+public class SimpleCipher {
+    private static final int ALPHABET_SIZE = 26;
+    private final char[] table;
+
+    public SimpleCipher(String tableFile) {
         try {
-            this.substitutionTable = readSubstitutionTable(substitutionTableFile);
+            this.table = this.readTable(tableFile);
+            if (this.table.length != ALPHABET_SIZE) {
+                throw new IllegalArgumentException("Таблица замены должна содержать 26 символов");
+            }
         } catch (IOException e) {
             throw new RuntimeException("Ошибка чтения таблицы замены из файла", e);
         }
     }
 
-    // Метод для чтения таблицы замены из файла
-    private char[] readSubstitutionTable(String substitutionTableFile) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(substitutionTableFile))) {
+    private char[] readTable(String tableFile) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
             StringBuilder tableBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -26,14 +30,13 @@ public class SimpleSubstitutionCipher {
         }
     }
 
-    // Метод для шифрования текста
     public String encrypt(String plaintext) {
         StringBuilder ciphertextBuilder = new StringBuilder();
         for (char ch : plaintext.toCharArray()) {
             if (Character.isLetter(ch)) {
                 int index = Character.toLowerCase(ch) - 'a';
-                if (index >= 0 && index < 26) {
-                    ciphertextBuilder.append(substitutionTable[index]);
+                if (index >= 0 && index < ALPHABET_SIZE) {
+                    ciphertextBuilder.append(this.table[index]);
                 } else {
                     ciphertextBuilder.append(ch);
                 }
@@ -44,4 +47,3 @@ public class SimpleSubstitutionCipher {
         return ciphertextBuilder.toString();
     }
 }
-
